@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي علامات بناء الفعل الماضي - أونلاين للجوالات</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        tajawal: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            gold: '#f59e0b',
+                            purple: '#8b5cf6',
+                            emerald: '#10b981'
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-short': 'bounce 0.6s ease-in-out 2',
+                        'float': 'float 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-glow-blue {
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-glow-blue:hover {
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .btn-glow-green {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .btn-glow-green:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .btn-glow-amber {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        .btn-glow-amber:hover {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:hover {
+            transform: scale(1.03);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #certificateModal, #certificateModal * {
+                visibility: visible;
+            }
+            #certificateModal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Sound and Top Controls -->
+    <header class="w-full p-4 flex justify-between items-center max-w-6xl mx-auto z-20">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-3 rounded-2xl shadow-lg">
+                <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-amber-300">
+                    تَحَدِّي بِنَاءِ الفِعْلِ المَاضِي (أونلاين)
+                </h1>
+                <p class="text-xs text-slate-400 hidden sm:block">منافسة حية ومباشرة من هواتف الطلاب</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="copyGameLink()" class="px-3 py-2 bg-emerald-800/80 hover:bg-emerald-700 rounded-xl border border-emerald-600 text-emerald-200 transition text-sm flex items-center gap-2" title="مشاركة رابط اللعبة">
+                <i class="fa-solid fa-share-nodes text-emerald-400"></i>
+                <span class="hidden md:inline">مشاركة الرابط</span>
+            </button>
+            <button id="soundToggleBtn" onclick="toggleSound()" class="px-3 py-2 bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition text-sm flex items-center gap-2" title="كتم/تشغيل الصوت">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-cyan-400"></i>
+                <span class="hidden md:inline">الصوت</span>
+            </button>
+            <button onclick="toggleFullScreen()" class="px-3 py-2 bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition text-sm" title="ملء الشاشة">
+                <i class="fa-solid fa-expand text-cyan-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-3 sm:p-6 max-w-5xl mx-auto w-full z-10">
+
+        <!-- VIEW 1: Main Home & Lobby View -->
+        <div id="viewHome" class="w-full glass-card rounded-3xl p-6 sm:p-8 transition-all duration-300">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <span class="px-4 py-1.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-3">
+                    <i class="fa-solid fa-wifi text-emerald-400 me-1"></i> منافسة تفاعلية حية عبر الجوالات
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-3">
+                    من سيكون بطل النحو والسرعة اليوم؟ 🏆
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    يدخل كل طالب من هاتفه الخاص برقم الغرفة، وتظهر الأسئلة للجميع في نفس الوقت بدون تشكيل للأفعال للتركيز على القاعدة النحوية!
+                </p>
+            </div>
+
+            <!-- Mode Tabs: Online Multi-device vs Single Device -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div id="modeCardOnline" onclick="switchMainTab('online')" class="p-5 rounded-2xl border-2 border-cyan-500 bg-cyan-950/30 cursor-pointer transition relative overflow-hidden group">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-cyan-500/20 rounded-xl text-cyan-400 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-mobile-screen-button text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white mb-1">منافسة حية من هواتف الطلاب (Online)</h3>
+                            <p class="text-xs text-slate-400">ينشئ المعلم غرفة، ويدخل الطلاب من جوالاتهم بنفس الكود ويتنافسون في نفس اللحظة.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modeCardLocal" onclick="switchMainTab('local')" class="p-5 rounded-2xl border-2 border-slate-700 bg-slate-800/30 cursor-pointer transition relative overflow-hidden group hover:border-slate-500">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-purple-500/20 rounded-xl text-purple-400 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-desktop text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white mb-1">منافسة على جهاز واحد (Local)</h3>
+                            <p class="text-xs text-slate-400">إدخال أسماء الطلاب ولعب الجولات بالتناوب على جهاز واحد.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 1 CONTENT: ONLINE ROOM MODE -->
+            <div id="tabOnlineContent" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-900/60 p-6 rounded-2xl border border-slate-700">
+                    <!-- Teacher Box -->
+                    <div class="p-5 bg-slate-800/80 rounded-xl border border-cyan-500/30 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wide block mb-1">
+                                <i class="fa-solid fa-chalkboard-user me-1"></i> للمعلم / المضيف
+                            </span>
+                            <h4 class="text-lg font-bold text-white mb-2">إنشاء غرفة مسابقة جديدة</h4>
+                            <p class="text-xs text-slate-400 mb-4">أنشئ رمز الغرفة واعْرِض الشاشة للطلاب على البروجكتور أو الشاشة الذكية.</p>
+                        </div>
+                        <button onclick="createOnlineRoom()" class="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 btn-glow-blue">
+                            <i class="fa-solid fa-plus-circle"></i> إنشاء غرفة وتوليد الكود
+                        </button>
+                    </div>
+
+                    <!-- Student Box -->
+                    <div class="p-5 bg-slate-800/80 rounded-xl border border-amber-500/30 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wide block mb-1">
+                                <i class="fa-solid fa-mobile-retro me-1"></i> للطالب من جواله
+                            </span>
+                            <h4 class="text-lg font-bold text-white mb-2">الانضمام إلى الغرفة</h4>
+                            <div class="space-y-2 mb-4">
+                                <input type="text" id="joinRoomCodeInput" placeholder="رمز الغرفة (مثال: 8492)" maxlength="4" 
+                                       class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-mono text-center tracking-widest focus:outline-none focus:border-amber-400 text-sm">
+                                <input type="text" id="joinStudentNameInput" placeholder="اكتب اسمك الكريِم..." 
+                                       class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 text-sm">
+                            </div>
+                        </div>
+                        <button onclick="joinOnlineRoom()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 btn-glow-amber">
+                            <i class="fa-solid fa-right-to-bracket"></i> دخول المنافسة من جوالك
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2 CONTENT: LOCAL MODE -->
+            <div id="tabLocalContent" class="hidden space-y-6">
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/60">
+                    <h4 class="font-bold text-purple-400 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fa-solid fa-user-plus"></i> أسماء الطلاب على هذا الجهاز:
+                    </h4>
+                    <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                        <input type="text" id="localStudentInput" placeholder="اسم الطالب..." 
+                               class="flex-grow px-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none text-sm">
+                        <button onclick="addLocalStudent()" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition text-sm">إضافة</button>
+                    </div>
+                    <div id="localStudentsChips" class="flex flex-wrap gap-2 p-3 bg-slate-950/40 rounded-xl min-h-[48px]"></div>
+                </div>
+                <button onclick="startLocalCompetition()" class="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white font-black text-lg rounded-2xl transition">
+                    ابدأ المسابقة المحلية 🚀
+                </button>
+            </div>
+
+            <div class="mt-8 flex justify-center">
+                <button onclick="openRulesModal()" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold rounded-2xl transition flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-book-open text-amber-400"></i> مراجعة قواعد علامات البناء
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 2: ONLINE WAITING ROOM (LOBBY) -->
+        <div id="viewWaitingRoom" class="w-full glass-card rounded-3xl p-6 sm:p-10 text-center hidden">
+            <span class="px-4 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-3">
+                <i class="fa-solid fa-house-signal me-1"></i> غرفة الانتظار الحية
+            </span>
+
+            <div class="mb-6">
+                <div class="text-xs text-slate-400 mb-1">رمز الغرفة للدخول من جوالات الطلاب:</div>
+                <div id="displayRoomCode" class="text-4xl sm:text-6xl font-black tracking-widest font-mono text-cyan-400 bg-slate-900/90 py-3 px-8 rounded-2xl border-2 border-cyan-500/50 inline-block shadow-inner">
+                    ----
+                </div>
+                <div class="mt-3">
+                    <button onclick="copyDirectRoomLink()" class="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/40 rounded-xl text-xs font-bold transition inline-flex items-center gap-2">
+                        <i class="fa-solid fa-link text-amber-400"></i> نسخ رابط الغرفة المباشر للطلاب
+                    </button>
+                </div>
+            </div>
+
+            <!-- Host Start Button -->
+            <div id="hostControls" class="hidden">
+                <button onclick="startOnlineGameForEveryone()" class="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xl rounded-2xl btn-glow-green transition">
+                    انطلاق التحدي الحَي لكل الطلاب الآن! 🚀
+                </button>
+            </div>
+            <!-- Student Waiting Message -->
+            <div id="studentWaitingNotice" class="hidden">
+                <div class="text-amber-300 text-sm font-bold animate-pulse flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hourglass-half"></i> تم انضمامك بنجاح! في انتظار المعلم لبدء التحدي...
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: LIVE QUIZ VIEW (Interactive Question Screen) -->
+        <div id="viewQuiz" class="w-full glass-card rounded-3xl p-4 sm:p-8 hidden relative overflow-hidden">
+            <!-- Header bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 p-3 sm:p-4 rounded-2xl border border-slate-700 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">المتنافس الحالي:</span>
+                        <h3 id="currentStudentDisplay" class="text-base sm:text-lg font-black text-amber-300">...</h3>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <!-- Timer -->
+                    <div class="text-center">
+                        <span class="text-[10px] text-slate-400 block">الزمن</span>
+                        <div class="text-base sm:text-lg font-mono font-bold text-cyan-400 flex items-center gap-1">
+                            <i class="fa-regular fa-clock text-xs"></i>
+                            <span id="timerDisplay">00.0s</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Score -->
+                    <div class="text-center">
+                        <span class="text-[10px] text-slate-400 block">النقاط</span>
+                        <div id="scoreDisplay" class="text-base sm:text-lg font-mono font-bold text-emerald-400">0</div>
+                    </div>
+
+                    <!-- Question Progress -->
+                    <div class="text-center">
+                        <span class="text-[10px] text-slate-400 block">السؤال</span>
+                        <div class="text-base sm:text-lg font-bold text-purple-300">
+                            <span id="qCurrent">1</span>/<span id="qTotal">10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-6 border border-slate-700">
+                <div id="quizProgressBar" class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Sentence Context Card (Verb Unvowelled) -->
+            <div class="bg-gradient-to-b from-slate-800/90 to-slate-900/90 p-6 sm:p-10 rounded-3xl border border-slate-700/80 mb-6 text-center relative shadow-inner">
+                <div class="text-xs font-bold text-slate-400 mb-2">اقرأ الجملة بتمعّن وحدّد علامة البناء الصحيحة للفعل الملون (بدون تشكيل):</div>
+                <div id="questionSentence" class="text-2xl sm:text-4xl font-black text-white leading-relaxed mb-4 tracking-wide">
+                    ...
+                </div>
+                <div class="text-xs text-amber-300 bg-amber-950/40 py-1.5 px-4 rounded-full inline-block border border-amber-800/60">
+                    الفعل المقصود: <span id="targetVerbText" class="font-black text-cyan-300 text-sm">...</span>
+                </div>
+            </div>
+
+            <!-- Answer Options (Fatha, Dammah, Sukun) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <!-- Fatha -->
+                <button onclick="handleAnswer('الفتح')" class="option-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 hover:from-cyan-900/40 hover:to-slate-800 border-2 border-slate-700 hover:border-cyan-400 rounded-2xl flex flex-col items-center justify-center gap-2 group cursor-pointer transition">
+                    <span class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition">
+                        َ
+                    </span>
+                    <span class="text-lg font-bold text-white group-hover:text-cyan-300">مبني على الفتح</span>
+                </button>
+
+                <!-- Dammah -->
+                <button onclick="handleAnswer('الضم')" class="option-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 hover:from-purple-900/40 hover:to-slate-800 border-2 border-slate-700 hover:border-purple-400 rounded-2xl flex flex-col items-center justify-center gap-2 group cursor-pointer transition">
+                    <span class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition">
+                        ُ
+                    </span>
+                    <span class="text-lg font-bold text-white group-hover:text-purple-300">مبني على الضم</span>
+                </button>
+
+                <!-- Sukun -->
+                <button onclick="handleAnswer('السكون')" class="option-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 hover:from-emerald-900/40 hover:to-slate-800 border-2 border-slate-700 hover:border-emerald-400 rounded-2xl flex flex-col items-center justify-center gap-2 group cursor-pointer transition">
+                    <span class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition">
+                        ْ
+                    </span>
+                    <span class="text-lg font-bold text-white group-hover:text-emerald-300">مبني على السكون</span>
+                </button>
+            </div>
+
+            <!-- Instant Feedback Overlay -->
+            <div id="feedbackBox" class="p-4 rounded-2xl text-center hidden transition-all duration-300">
+                <div id="feedbackText" class="font-bold text-base sm:text-lg mb-1"></div>
+                <div id="feedbackReason" class="text-xs sm:text-sm text-slate-300"></div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: LIVE LEADERBOARD & PODIUM -->
+        <div id="viewLeaderboard" class="w-full glass-card rounded-3xl p-6 sm:p-8 hidden">
+            <div class="text-center mb-8">
+                <span class="px-4 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-2">
+                    <i class="fa-solid fa-crown text-amber-400 me-1"></i> لوحة الشرف والتكريم الحية
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-black text-white">ترتيب الفرسان وأبطال الدرس 🥇</h2>
+                <p class="text-slate-300 text-xs sm:text-sm mt-1">يتم الترتيب بناءً على أعلى درجات مع أسرع زمن إجابة</p>
+            </div>
+
+            <!-- PODIUM -->
+            <div id="podiumContainer" class="flex justify-center items-end gap-2 sm:gap-4 mb-8 min-h-[220px]">
+                <!-- 2nd -->
+                <div id="podium2" class="flex flex-col items-center w-24 sm:w-32 opacity-0 transition-all duration-700">
+                    <div class="text-center mb-2">
+                        <div class="w-10 h-10 rounded-full bg-slate-300/20 border-2 border-slate-300 flex items-center justify-center text-slate-200 font-bold mx-auto mb-1 text-xs">🥈</div>
+                        <div id="p2Name" class="font-bold text-xs text-slate-200 truncate max-w-[80px]">...</div>
+                        <div id="p2Score" class="text-[10px] text-slate-400">...</div>
+                    </div>
+                    <div class="w-full h-28 bg-gradient-to-t from-slate-700 to-slate-500 rounded-t-2xl border-t-4 border-slate-300 flex items-center justify-center font-black text-xl text-slate-100 shadow-xl">2</div>
+                </div>
+
+                <!-- 1st -->
+                <div id="podium1" class="flex flex-col items-center w-28 sm:w-36 opacity-0 transition-all duration-700">
+                    <div class="text-center mb-2 animate-float">
+                        <i class="fa-solid fa-crown text-amber-400 text-lg block"></i>
+                        <div class="w-12 h-12 rounded-full bg-amber-500/30 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-black mx-auto mb-1 text-sm">🥇</div>
+                        <div id="p1Name" class="font-black text-sm text-amber-300 truncate max-w-[100px]">...</div>
+                        <div id="p1Score" class="text-xs text-amber-400 font-bold">...</div>
+                    </div>
+                    <div class="w-full h-36 bg-gradient-to-t from-amber-700 via-amber-500 to-yellow-400 rounded-t-2xl border-t-4 border-yellow-200 flex items-center justify-center font-black text-3xl text-amber-950 shadow-2xl">1</div>
+                </div>
+
+                <!-- 3rd -->
+                <div id="podium3" class="flex flex-col items-center w-24 sm:w-32 opacity-0 transition-all duration-700">
+                    <div class="text-center mb-2">
+                        <div class="w-10 h-10 rounded-full bg-amber-800/30 border-2 border-amber-700 flex items-center justify-center text-amber-600 font-bold mx-auto mb-1 text-xs">🥉</div>
+                        <div id="p3Name" class="font-bold text-xs text-amber-600 truncate max-w-[80px]">...</div>
+                        <div id="p3Score" class="text-[10px] text-slate-400">...</div>
+                    </div>
+                    <div class="w-full h-20 bg-gradient-to-t from-amber-900 to-amber-800 rounded-t-2xl border-t-4 border-amber-600 flex items-center justify-center font-black text-xl text-amber-200 shadow-xl">3</div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-slate-900/80 rounded-2xl border border-slate-700 overflow-hidden mb-6">
+                <table class="w-full text-right text-xs sm:text-sm">
+                    <thead class="bg-slate-800 text-slate-400 text-[11px]">
+                        <tr>
+                            <th class="p-3 text-center">المركز</th>
+                            <th class="p-3">اسم الطالب</th>
+                            <th class="p-3 text-center">الإجابات</th>
+                            <th class="p-3 text-center">الزمن</th>
+                            <th class="p-3 text-center">النقاط</th>
+                            <th class="p-3 text-center">الشهادة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTableBody" class="divide-y divide-slate-800 text-slate-200"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-center gap-3">
+                <button onclick="restartGame()" class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> العودة للرئيسية
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CERTIFICATE MODAL -->
+    <div id="certificateModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border-2 border-amber-500/80 rounded-3xl p-6 sm:p-10 max-w-2xl w-full text-center relative shadow-2xl text-slate-100">
+            <button onclick="closeCertificate()" class="no-print absolute top-4 left-4 w-10 h-10 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="p-6 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 rounded-2xl border-4 border-double border-amber-400/60 shadow-inner">
+                <div class="flex justify-between items-center mb-4">
+                    <i class="fa-solid fa-award text-3xl text-amber-400"></i>
+                    <span class="text-xs text-amber-300 font-bold tracking-widest uppercase">شهادة تفوق نَحْوِيّ</span>
+                    <i class="fa-solid fa-award text-3xl text-amber-400"></i>
+                </div>
+
+                <h3 class="text-2xl sm:text-3xl font-black text-amber-300 mb-2">شَهَادَةُ تَقْدِيرٍ وَتَفَوُّقٍ</h3>
+                <p class="text-xs text-slate-300 mb-4">تَشْهَدُ إِدَارَةُ المَسَابَقَةِ بِأَنَّ الطَّالِبَ المَبْدِعَ:</p>
+
+                <div id="certStudentName" class="text-2xl sm:text-3xl font-black text-cyan-300 my-2 border-b-2 border-cyan-500/40 pb-2 inline-block px-8">...</div>
+
+                <p class="text-sm text-slate-200 leading-relaxed max-w-lg mx-auto my-4">
+                    قَدْ حَصَلَ عَلَى المَرْكَزِ <span id="certRank" class="font-bold text-amber-400">...</span> فِي مَسَابَقَةِ <span class="text-cyan-300 font-bold">"علامات بناء الفعل الماضي"</span> بِمَجْمُوعِ نِقَاطٍ <span id="certScore" class="font-bold text-emerald-400">...</span> نُقْطَةً فِي زَمَنٍ قِيَاسِيٍّ قَدْرُهُ <span id="certTime" class="font-bold text-sky-300">...</span> ثَانِيَةً.
+                </p>
+
+                <div class="flex justify-between items-center text-xs text-slate-400 pt-4 border-t border-slate-700">
+                    <div>التاريخ: <span id="certDate">---</span></div>
+                    <div class="text-amber-400 font-bold">مع أطيب التمنيات بدوام التوفيق! ✨</div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-center gap-3 no-print">
+                <button onclick="window.print()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> طباعة الشهادة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RULES MODAL -->
+    <div id="rulesModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto text-slate-200 relative">
+            <button onclick="closeRulesModal()" class="absolute top-4 left-4 w-9 h-9 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-amber-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark"></i> قواعد علامات بناء الفعل الماضي
+            </h3>
+
+            <div class="space-y-4 text-xs sm:text-sm">
+                <div class="p-4 bg-cyan-950/40 border border-cyan-800/60 rounded-2xl">
+                    <h4 class="font-bold text-cyan-300 text-base mb-1">1. يُبنى على الفتح:</h4>
+                    <p class="text-slate-300">إذا لم يتصل به شيء (كتبَ) - أو اتصلت به تاء التأنيث (كتبَتْ) - أو ألف الاثنين (كتبَا) - أو ناء المفعولين (أكرمَنا المعلم).</p>
+                </div>
+                <div class="p-4 bg-purple-950/40 border border-purple-800/60 rounded-2xl">
+                    <h4 class="font-bold text-purple-300 text-base mb-1">2. يُبنى على الضم:</h4>
+                    <p class="text-slate-300">إذا اتصلت به واو الجماعة (كتبُوا - سافرُوا).</p>
+                </div>
+                <div class="p-4 bg-emerald-950/40 border border-emerald-800/60 rounded-2xl">
+                    <h4 class="font-bold text-emerald-300 text-base mb-1">3. يُبنى على السكون:</h4>
+                    <p class="text-slate-300">إذا اتصلت به تاء الفاعل (كتبْتُ) - أو نا الفاعلين (كتبْنَا) - أو نون النسوة (كتبْنَ).</p>
+                </div>
+            </div>
+            <button onclick="closeRulesModal()" class="w-full mt-6 py-3 bg-slate-800 text-slate-200 font-bold rounded-xl">جاهز للتحدي! 👍</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE REALTIME MULTIPLAYER SYSTEM -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration & Initialization
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'past-tense-challenge-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:demo"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let currentRoomId = null;
+        let isHost = false;
+        let roomUnsubscribe = null;
+
+        // Authenticate anonymously or via custom token
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const userCred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = userCred.user;
+                } else {
+                    const userCred = await signInAnonymously(auth);
+                    currentUser = userCred.user;
+                }
+            } catch (e) {
+                console.log("Auth initialized/bypassed", e);
+            }
+            
+            // Auto check URL parameter for room code
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam) {
+                const joinInput = document.getElementById('joinRoomCodeInput');
+                if (joinInput) joinInput.value = roomParam;
+            }
+        }
+        initAuth();
+
+        window.copyGameLink = function() {
+            const baseUrl = window.location.href.split('?')[0];
+            const tempInput = document.createElement('input');
+            tempInput.value = baseUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('تم نسخ رابط اللعبة بنجاح! يمكنك إرساله للطلاب الآن.');
+        };
+
+        window.copyDirectRoomLink = function() {
+            if (!currentRoomId) return;
+            const baseUrl = window.location.href.split('?')[0];
+            const directUrl = `${baseUrl}?room=${currentRoomId}`;
+            const tempInput = document.createElement('input');
+            tempInput.value = directUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert(`تم نسخ رابط الغرفة المباشر (رمز ${currentRoomId})! عندما يفتحه الطالب سينضم فوراً للغرفة.`);
+        };
+
+        window.createOnlineRoom = async function() {
+            if (!currentUser) await initAuth();
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
+            currentRoomId = code;
+            isHost = true;
+
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            await setDoc(roomRef, {
+                status: 'waiting',
+                created: Date.now(),
+                players: {}
+            });
+
+            setupRoomListener();
+            document.getElementById('displayRoomCode').innerText = currentRoomId;
+            document.getElementById('hostControls').classList.remove('hidden');
+            document.getElementById('studentWaitingNotice').classList.add('hidden');
+            switchView('viewWaitingRoom');
+        };
+
+        window.joinOnlineRoom = async function() {
+            if (!currentUser) await initAuth();
+            const code = document.getElementById('joinRoomCodeInput').value.trim();
+            const studentName = document.getElementById('joinStudentNameInput').value.trim();
+
+            if (!code || code.length !== 4) {
+                alert('يرجى إدخال رمز الغرفة المكون من 4 أرقام!');
+                return;
+            }
+            if (!studentName) {
+                alert('يرجى إدخال اسم الطالب!');
+                return;
+            }
+
+            currentRoomId = code;
+            isHost = false;
+            window.myStudentName = studentName;
+
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            
+            // Add player to Firestore room document
+            const playerKey = currentUser ? currentUser.uid : 'user_' + Math.random().toString(36).substr(2, 6);
+            window.myPlayerKey = playerKey;
+
+            await updateDoc(roomRef, {
+                [`players.${playerKey}`]: {
+                    name: studentName,
+                    score: 0,
+                    correct: 0,
+                    time: 0,
+                    finished: false
+                }
+            }).catch(async () => {
+                alert('عذراً، لم نتمكن من العثور على الغرفة. تحقق من الرمز.');
+            });
+
+            setupRoomListener();
+            document.getElementById('displayRoomCode').innerText = currentRoomId;
+            document.getElementById('hostControls').classList.add('hidden');
+            document.getElementById('studentWaitingNotice').classList.remove('hidden');
+            switchView('viewWaitingRoom');
+        };
+
+        function setupRoomListener() {
+            if (roomUnsubscribe) roomUnsubscribe();
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+
+            roomUnsubscribe = onSnapshot(roomRef, (snapshot) => {
+                if (!snapshot.exists()) return;
+                const data = snapshot.data();
+
+                // Render Connected Students Grid
+                const players = data.players || {};
+                const playerList = Object.values(players);
+                document.getElementById('connectedCount').innerText = playerList.length;
+
+                const grid = document.getElementById('joinedStudentsGrid');
+                grid.innerHTML = '';
+                playerList.forEach(p => {
+                    const chip = document.createElement('div');
+                    chip.className = "px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-cyan-300 flex items-center gap-1.5 animate-fadeIn";
+                    chip.innerHTML = `<i class="fa-solid fa-user-graduate text-amber-400"></i> ${p.name}`;
+                    grid.appendChild(chip);
+                });
+
+                // Auto launch quiz when Host clicks start
+                if (data.status === 'active' && document.getElementById('viewQuiz').classList.contains('hidden') && !window.quizStarted) {
+                    window.quizStarted = true;
+                    launchQuizForStudent(window.myStudentName || 'المضيف');
+                }
+
+                // If on leaderboard view, sync live score table
+                if (!document.getElementById('viewLeaderboard').classList.contains('hidden')) {
+                    renderLeaderboardFromList(playerList);
+                }
+            }, (err) => console.log("Room listener error", err));
+        }
+
+        window.startOnlineGameForEveryone = async function() {
+            if (!currentRoomId) return;
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            await updateDoc(roomRef, { status: 'active' });
+        };
+
+        function launchQuizForStudent(name) {
+            myScore = 0;
+            myCorrectCount = 0;
+            currentQuestionIdx = 0;
+            elapsedSeconds = 0;
+
+            gameActiveQuestions = [...QUESTION_BANK].sort(() => 0.5 - Math.random()).slice(0, 10);
+
+            document.getElementById('currentStudentDisplay').innerText = name;
+            document.getElementById('qCurrent').innerText = '1';
+            document.getElementById('qTotal').innerText = gameActiveQuestions.length;
+            document.getElementById('scoreDisplay').innerText = '0';
+
+            switchView('viewQuiz');
+            renderQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            const startTime = Date.now();
+            timerInterval = setInterval(() => {
+                elapsedSeconds = (Date.now() - startTime) / 1000;
+                document.getElementById('timerDisplay').innerText = elapsedSeconds.toFixed(1) + 's';
+            }, 100);
+        }
+
+        function renderQuestion() {
+            const q = gameActiveQuestions[currentQuestionIdx];
+            
+            // Format sentence highlighting target verb (Unvowelled verb)
+            const highlightedSentence = q.sentence.replace(
+                q.verb, 
+                `<span class="text-amber-300 font-extrabold underline decoration-cyan-400 underline-offset-8 px-2 bg-cyan-950/50 rounded">${q.verb}</span>`
+            );
+
+            document.getElementById('questionSentence').innerHTML = highlightedSentence;
+            document.getElementById('targetVerbText').innerText = q.verb;
+
+            const prog = (currentQuestionIdx / gameActiveQuestions.length) * 100;
+            document.getElementById('quizProgressBar').style.width = `${prog}%`;
+            document.getElementById('feedbackBox').classList.add('hidden');
+        }
+
+        window.handleAnswer = async function(selectedSign) {
+            const q = gameActiveQuestions[currentQuestionIdx];
+            const feedbackBox = document.getElementById('feedbackBox');
+            const feedbackText = document.getElementById('feedbackText');
+            const feedbackReason = document.getElementById('feedbackReason');
+
+            feedbackBox.classList.remove('hidden');
+            const isCorrect = (selectedSign === q.answer);
+
+            if (isCorrect) {
+                playSound('correct');
+                myCorrectCount++;
+                const points = 100 + Math.max(0, Math.round(50 - elapsedSeconds));
+                myScore += points;
+
+                feedbackBox.className = "p-4 rounded-2xl text-center bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 block animate-bounce-short";
+                feedbackText.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 me-2"></i> إجابة صحيحة! (+${points} نقطة)`;
+                feedbackReason.innerText = `الفعل (${q.verb}) مبني على ${q.answer} - ${q.reason}`;
+            } else {
+                playSound('wrong');
+                feedbackBox.className = "p-4 rounded-2xl text-center bg-red-950/80 border border-red-500/60 text-red-300 block";
+                feedbackText.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400 me-2"></i> إجابة خاطئة! الصواب: (${q.answer})`;
+                feedbackReason.innerText = `السبب: الفعل (${q.verb}) مبني على ${q.answer} - ${q.reason}`;
+            }
+
+            document.getElementById('scoreDisplay').innerText = myScore;
+
+            setTimeout(async () => {
+                currentQuestionIdx++;
+                if (currentQuestionIdx < gameActiveQuestions.length) {
+                    document.getElementById('qCurrent').innerText = currentQuestionIdx + 1;
+                    renderQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 1300);
+        };
+
+        async function finishQuiz() {
+            clearInterval(timerInterval);
+            const totalTime = parseFloat(elapsedSeconds.toFixed(1));
+
+            if (currentRoomId && window.myPlayerKey) {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                await updateDoc(roomRef, {
+                    [`players.${window.myPlayerKey}.score`]: myScore,
+                    [`players.${window.myPlayerKey}.correct`]: myCorrectCount,
+                    [`players.${window.myPlayerKey}.time`]: totalTime,
+                    [`players.${window.myPlayerKey}.finished`]: true
+                });
+            }
+
+            try {
+                confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+            } catch(e){}
+
+            switchView('viewLeaderboard');
+        }
+
+        function renderLeaderboardFromList(list) {
+            list.sort((a, b) => (b.score !== a.score) ? b.score - a.score : a.time - b.time);
+
+            // Podium
+            if (list[0]) {
+                document.getElementById('p1Name').innerText = list[0].name;
+                document.getElementById('p1Score').innerText = `${list[0].score} ن (${list[0].time}s)`;
+                document.getElementById('podium1').classList.remove('opacity-0');
+            }
+            if (list[1]) {
+                document.getElementById('p2Name').innerText = list[1].name;
+                document.getElementById('p2Score').innerText = `${list[1].score} ن (${list[1].time}s)`;
+                document.getElementById('podium2').classList.remove('opacity-0');
+            }
+            if (list[2]) {
+                document.getElementById('p3Name').innerText = list[2].name;
+                document.getElementById('p3Score').innerText = `${list[2].score} ن (${list[2].time}s)`;
+                document.getElementById('podium3').classList.remove('opacity-0');
+            }
+
+            const tbody = document.getElementById('leaderboardTableBody');
+            tbody.innerHTML = '';
+            list.forEach((item, idx) => {
+                const rank = idx + 1;
+                let badge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+                const tr = document.createElement('tr');
+                tr.className = rank === 1 ? "bg-amber-500/10 font-bold" : "hover:bg-slate-800/50";
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-sm">${badge}</td>
+                    <td class="p-3 text-white font-bold">${item.name}</td>
+                    <td class="p-3 text-center text-emerald-400">${item.correct || 0}/10</td>
+                    <td class="p-3 text-center text-cyan-300 font-mono">${item.time || 0}s</td>
+                    <td class="p-3 text-center text-amber-400 font-black">${item.score || 0}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="openCertificate('${item.name}', ${rank}, ${item.score || 0}, ${item.time || 0})" class="px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded text-xs font-bold">
+                            <i class="fa-solid fa-certificate me-1"></i> الشهادة
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.addLocalStudent = function() {
+            const input = document.getElementById('localStudentInput');
+            const val = input.value.trim();
+            if (val) {
+                localStudents.push(val);
+                input.value = '';
+                renderLocalChips();
+            }
+        };
+
+        function renderLocalChips() {
+            const container = document.getElementById('localStudentsChips');
+            container.innerHTML = '';
+            localStudents.forEach((name) => {
+                const chip = document.createElement('div');
+                chip.className = "px-3 py-1 bg-purple-900/40 border border-purple-600/50 rounded-xl text-xs text-purple-200 font-bold";
+                chip.innerText = name;
+                container.appendChild(chip);
+            });
+        }
+
+        window.startLocalCompetition = function() {
+            if (localStudents.length === 0) {
+                alert('يرجى إضافة طالب واحد على الأقل!');
+                return;
+            }
+            localIndex = 0;
+            launchQuizForStudent(localStudents[localIndex]);
+        };
+
+        window.restartGame = function() {
+            window.quizStarted = false;
+            switchView('viewHome');
+        };
+
+        window.openCertificate = function(name, rank, score, time) {
+            document.getElementById('certStudentName').innerText = name;
+            document.getElementById('certRank').innerText = rank === 1 ? 'الأول 🥇' : rank === 2 ? 'الثاني 🥈' : rank === 3 ? 'الثالث 🥉' : `المتميز (${rank})`;
+            document.getElementById('certScore').innerText = score;
+            document.getElementById('certTime').innerText = time;
+            const today = new Date();
+            document.getElementById('certDate').innerText = `${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+            document.getElementById('certificateModal').classList.remove('hidden');
+        };
+
+        window.closeCertificate = function() {
+            document.getElementById('certificateModal').classList.add('hidden');
+        };
+
+        window.openRulesModal = function() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        };
+
+        window.closeRulesModal = function() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        };
+
+        window.toggleSound = function() {
+            const icon = document.getElementById('soundIcon');
+            if (icon.classList.contains('fa-volume-high')) {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-cyan-400';
+            }
+        };
+
+        window.toggleFullScreen = function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        };
+
+        function switchView(viewId) {
+            ['viewHome', 'viewWaitingRoom', 'viewQuiz', 'viewLeaderboard'].forEach(id => {
+                document.getElementById(id).classList.toggle('hidden', id !== viewId);
+            });
+        }
+    </script>
+</body>
+</html>

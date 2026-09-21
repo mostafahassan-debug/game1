@@ -3,1130 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي علامات بناء الفعل الماضي - منافسة تفاعلية</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (Tajawal) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Canvas Confetti Library -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        tajawal: ['Tajawal', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            gold: '#f59e0b',
-                            purple: '#8b5cf6',
-                            emerald: '#10b981',
-                            cyan: '#06b6d4'
-                        }
-                    },
-                    animation: {
-                        'bounce-short': 'bounce 0.6s ease-in-out 2',
-                        'float': 'float 3s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-8px)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <title>لعبة بناء وإعراب الأفعال</title>
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             min-height: 100vh;
-            color: #f8fafc;
-            overflow-x: hidden;
-            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
         }
-
-        .glass-card {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        .game-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
         }
-
-        .btn-glow-green {
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        h1 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #2a5298;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+        button.start-btn, button.next-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+        button.start-btn:hover, button.next-btn:hover {
+            background: #219150;
+        }
+        .question-box {
+            background: #f4f7f6;
+            border-right: 6px solid #2a5298;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 17px;
+            cursor: pointer;
             transition: all 0.2s ease;
+            text-align: right;
         }
-        .btn-glow-green:hover {
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.7);
-            transform: translateY(-2px);
+        .option-btn:hover {
+            border-color: #2a5298;
+            background: #f0f4f9;
         }
-
-        .option-card {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        .option-btn.correct {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724;
         }
-        .option-card:hover {
-            transform: translateY(-4px) scale(1.02);
+        .option-btn.wrong {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24;
         }
-        .option-card:active {
-            transform: scale(0.97);
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #555;
         }
-
-        ::-webkit-scrollbar {
-            width: 8px;
+        .hidden {
+            display: none;
         }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
+        .feedback {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #certificateModal, #certificateModal * {
-                visibility: visible;
-            }
-            #certificateModal {
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background: white !important;
-                color: black !important;
-                box-shadow: none !important;
-            }
-            .no-print {
-                display: none !important;
-            }
+        .status-msg {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-    <!-- HEADER -->
-    <header class="w-full p-4 flex flex-wrap justify-between items-center max-w-6xl mx-auto z-20 gap-3">
-        <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-3 rounded-2xl shadow-lg flex items-center justify-center">
-                <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
-            </div>
-            <div>
-                <h1 class="text-lg sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-amber-300">
-                    تَحَدِّي بِنَاءِ الفِعْلِ المَاضِي
-                </h1>
-                <p class="text-xs text-slate-400 hidden sm:block">منافسة حية ومباشرة متزامنة بين جميع الهواتف</p>
-            </div>
+<div class="game-card">
+    <!-- شاشة البداية -->
+    <div id="start-screen">
+        <h1>لعبة إعراب وبناء الأفعال 🎮</h1>
+        <p>اختبر معلوماتك في الفعل الماضي والمضارع (العلامات الأصلية والفرعية)</p>
+        <div class="input-group">
+            <input type="text" id="player-name" placeholder="أدخل اسمك الثلاثي للبدء..." required>
         </div>
-
-        <div class="flex items-center gap-2 sm:gap-3">
-            <!-- Status Indicator Badge -->
-            <div id="cloudStatusBadge" class="px-3 py-1.5 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-emerald-400 text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="cloudStatusText">جاري الاتصال بالسحابة... ☁️</span>
-            </div>
-
-            <button onclick="copyGameLink()" class="px-3 py-2 bg-emerald-900/80 hover:bg-emerald-800 rounded-xl border border-emerald-600 text-emerald-200 transition text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
-                <i class="fa-solid fa-share-nodes text-emerald-400"></i>
-                <span class="hidden md:inline">مشاركة الرابط</span>
-            </button>
-            <button id="soundToggleBtn" onclick="toggleSound()" class="px-3 py-2 bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition text-xs sm:text-sm flex items-center gap-2 cursor-pointer">
-                <i id="soundIcon" class="fa-solid fa-volume-high text-cyan-400"></i>
-                <span class="hidden md:inline">الصوت</span>
-            </button>
-            <button onclick="toggleFullScreen()" class="px-3 py-2 bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition text-xs sm:text-sm cursor-pointer">
-                <i class="fa-solid fa-expand text-cyan-400"></i>
-            </button>
-        </div>
-    </header>
-
-    <main class="flex-grow flex items-center justify-center p-3 sm:p-6 max-w-5xl mx-auto w-full z-10">
-
-        <!-- VIEW 1: HOME VIEW -->
-        <div id="viewHome" class="w-full glass-card rounded-3xl p-5 sm:p-8 transition-all duration-300">
-            <div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
-                <span class="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-3">
-                    <i class="fa-solid fa-bolt text-amber-400 me-1"></i> تجميع مباشر وحقيقي للدرجات من كافة الهواتف 🌐
-                </span>
-                <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-3">
-                    من سيكون بطل النحو والسرعة اليوم؟ 🏆
-                </h2>
-                <p class="text-slate-300 text-xs sm:text-base leading-relaxed">
-                    ادخل اسمك واختر بطلك، وابدأ التحدي فوراً. ستُسجل نقاطك وتظهر في لوحة الشرف المشتركة بين جميع الطلاب!
-                </p>
-            </div>
-
-            <!-- Student Profile Input Card -->
-            <div class="max-w-xl mx-auto bg-slate-900/80 p-5 sm:p-6 rounded-2xl border border-slate-700 space-y-5 mb-6">
-                <div>
-                    <label class="text-xs font-bold text-cyan-400 block mb-2">
-                        <i class="fa-solid fa-user-pen me-1"></i> اسم الطالب / المتنافس:
-                    </label>
-                    <input type="text" id="directStudentNameInput" placeholder="اكتب اسمك الكريِم هنا..." 
-                           class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 text-sm">
-                </div>
-
-                <!-- Avatar Selection -->
-                <div>
-                    <label class="text-xs font-bold text-amber-400 block mb-2">
-                        <i class="fa-solid fa-mask me-1"></i> اختر أيقونة بطلك 🦸‍♂️:
-                    </label>
-                    <div class="flex justify-between items-center bg-slate-800 p-2.5 rounded-xl border border-slate-700 text-xl">
-                        <button type="button" onclick="selectAvatar('🚀')" class="avatar-opt p-2 hover:bg-slate-700 rounded-xl transition cursor-pointer" data-avatar="🚀">🚀</button>
-                        <button type="button" onclick="selectAvatar('🦁')" class="avatar-opt p-2 hover:bg-slate-700 rounded-xl transition cursor-pointer" data-avatar="🦁">🦁</button>
-                        <button type="button" onclick="selectAvatar('🦅')" class="avatar-opt p-2 hover:bg-slate-700 rounded-xl transition cursor-pointer" data-avatar="🦅">🦅</button>
-                        <button type="button" onclick="selectAvatar('⭐')" class="avatar-opt p-2 hover:bg-slate-700 rounded-xl transition cursor-pointer" data-avatar="⭐">⭐</button>
-                        <button type="button" onclick="selectAvatar('🔥')" class="avatar-opt p-2 hover:bg-slate-700 rounded-xl transition cursor-pointer" data-avatar="🔥">🔥</button>
-                        <button type="button" onclick="selectAvatar('👑')" class="avatar-opt p-2 hover:bg-slate-700 rounded-xl transition cursor-pointer" data-avatar="👑">👑</button>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="space-y-3">
-                    <button onclick="startDirectGame()" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black text-lg rounded-2xl transition shadow-lg flex items-center justify-center gap-2 btn-glow-green cursor-pointer">
-                        <i class="fa-solid fa-play"></i> انطلاق التحدي المباشر 🚀
-                    </button>
-                    
-                    <button onclick="viewLeaderboardOnly()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs sm:text-sm rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-trophy text-amber-400"></i> مشاهدة لوحة الصدارة العامة للطلاب
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap justify-center gap-3">
-                <button onclick="openRulesModal()" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold rounded-2xl transition flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
-                    <i class="fa-solid fa-book-open text-amber-400"></i> مراجعة قواعد علامات البناء
-                </button>
-            </div>
-        </div>
-
-        <!-- VIEW 2: LIVE QUIZ VIEW -->
-        <div id="viewQuiz" class="w-full glass-card rounded-3xl p-4 sm:p-8 hidden relative overflow-hidden">
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 p-3 sm:p-4 rounded-2xl border border-slate-700 mb-6">
-                <div class="flex items-center gap-3">
-                    <div id="studentAvatarBadge" class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xl">
-                        🚀
-                    </div>
-                    <div>
-                        <span class="text-[10px] sm:text-xs text-slate-400 block">المتنافس الحالي:</span>
-                        <h3 id="currentStudentDisplay" class="text-sm sm:text-lg font-black text-amber-300">...</h3>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3 sm:gap-6">
-                    <div class="text-center">
-                        <span class="text-[10px] text-slate-400 block">السلسلة 🔥</span>
-                        <div id="streakDisplay" class="text-sm sm:text-lg font-mono font-bold text-amber-400">0x</div>
-                    </div>
-
-                    <div class="text-center">
-                        <span class="text-[10px] text-slate-400 block">الزمن</span>
-                        <div class="text-sm sm:text-lg font-mono font-bold text-cyan-400 flex items-center gap-1">
-                            <i class="fa-regular fa-clock text-xs"></i>
-                            <span id="timerDisplay">00.0s</span>
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        <span class="text-[10px] text-slate-400 block">النقاط 🏆</span>
-                        <div id="scoreDisplay" class="text-sm sm:text-lg font-mono font-bold text-emerald-400">0</div>
-                    </div>
-
-                    <div class="text-center">
-                        <span class="text-[10px] text-slate-400 block">السؤال</span>
-                        <div class="text-sm sm:text-lg font-bold text-purple-300">
-                            <span id="qCurrent">1</span>/<span id="qTotal">10</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-6 border border-slate-700">
-                <div id="quizProgressBar" class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>
-            </div>
-
-            <!-- Sentence Context Card (Unvowelled) -->
-            <div class="bg-gradient-to-b from-slate-800/90 to-slate-900/90 p-6 sm:p-10 rounded-3xl border border-slate-700/80 mb-6 text-center relative shadow-inner">
-                <div class="text-xs font-bold text-amber-400/90 mb-2">
-                    <i class="fa-solid fa-eye me-1"></i> اقرأ الجملة بتمعّن وحدّد علامة البناء الصحيحة للفعل (المكتوب بدون تشكيل):
-                </div>
-                <div id="questionSentence" class="text-2xl sm:text-4xl font-black text-white leading-relaxed mb-4 tracking-wide">
-                    ...
-                </div>
-                <div class="text-xs text-slate-300 bg-slate-950/60 py-1.5 px-4 rounded-full inline-block border border-slate-700">
-                    الفعل المقصود: <span id="targetVerbText" class="font-black text-cyan-300 text-sm sm:text-base">...</span>
-                </div>
-            </div>
-
-            <!-- Answer Options -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <!-- Fatha -->
-                <button onclick="handleAnswer('الفتح', this)" class="option-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 hover:from-cyan-900/40 hover:to-slate-800 border-2 border-slate-700 hover:border-cyan-400 rounded-2xl flex flex-col items-center justify-center gap-2 group cursor-pointer transition shadow-md">
-                    <span class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition">
-                        َ
-                    </span>
-                    <span class="text-base sm:text-lg font-bold text-white group-hover:text-cyan-300">مبني على الفتح</span>
-                </button>
-
-                <!-- Dammah -->
-                <button onclick="handleAnswer('الضم', this)" class="option-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 hover:from-purple-900/40 hover:to-slate-800 border-2 border-slate-700 hover:border-purple-400 rounded-2xl flex flex-col items-center justify-center gap-2 group cursor-pointer transition shadow-md">
-                    <span class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition">
-                        ُ
-                    </span>
-                    <span class="text-base sm:text-lg font-bold text-white group-hover:text-purple-300">مبني على الضم</span>
-                </button>
-
-                <!-- Sukun -->
-                <button onclick="handleAnswer('السكون', this)" class="option-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 hover:from-emerald-900/40 hover:to-slate-800 border-2 border-slate-700 hover:border-emerald-400 rounded-2xl flex flex-col items-center justify-center gap-2 group cursor-pointer transition shadow-md">
-                    <span class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition">
-                        ْ
-                    </span>
-                    <span class="text-base sm:text-lg font-bold text-white group-hover:text-emerald-300">مبني على السكون</span>
-                </button>
-            </div>
-
-            <!-- Instant Feedback Box -->
-            <div id="feedbackBox" class="p-4 rounded-2xl text-center hidden transition-all duration-300">
-                <div id="feedbackText" class="font-bold text-base sm:text-lg mb-1"></div>
-                <div id="feedbackReason" class="text-xs sm:text-sm text-slate-300"></div>
-            </div>
-        </div>
-
-        <!-- VIEW 3: LIVE LEADERBOARD & PODIUM -->
-        <div id="viewLeaderboard" class="w-full glass-card rounded-3xl p-6 sm:p-8 hidden">
-            <div class="text-center mb-8">
-                <span class="px-4 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-2">
-                    <i class="fa-solid fa-crown text-amber-400 me-1"></i> لوحة الشرف العامة الموحدة 🌐
-                </span>
-                <h2 class="text-2xl sm:text-4xl font-black text-white">ترتيب الفرسان وأبطال الدرس 🥇</h2>
-                <p class="text-slate-300 text-xs sm:text-sm mt-1">تتحدث درجات جميع الطلاب المباشرة تلقائياً من كافة الجوالات</p>
-            </div>
-
-            <!-- PODIUM -->
-            <div id="podiumContainer" class="flex justify-center items-end gap-2 sm:gap-4 mb-8 min-h-[220px]">
-                <!-- 2nd Place -->
-                <div id="podium2" class="flex flex-col items-center w-24 sm:w-32 transition-all duration-700">
-                    <div class="text-center mb-2">
-                        <div class="w-10 h-10 rounded-full bg-slate-300/20 border-2 border-slate-300 flex items-center justify-center text-slate-200 font-bold mx-auto mb-1 text-xs">🥈</div>
-                        <div id="p2Name" class="font-bold text-xs text-slate-200 truncate max-w-[80px]">---</div>
-                        <div id="p2Score" class="text-[10px] text-slate-400">---</div>
-                    </div>
-                    <div class="w-full h-28 bg-gradient-to-t from-slate-700 to-slate-500 rounded-t-2xl border-t-4 border-slate-300 flex items-center justify-center font-black text-xl text-slate-100 shadow-xl">2</div>
-                </div>
-
-                <!-- 1st Place -->
-                <div id="podium1" class="flex flex-col items-center w-28 sm:w-36 transition-all duration-700">
-                    <div class="text-center mb-2 animate-float">
-                        <i class="fa-solid fa-crown text-amber-400 text-lg block"></i>
-                        <div class="w-12 h-12 rounded-full bg-amber-500/30 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-black mx-auto mb-1 text-sm">🥇</div>
-                        <div id="p1Name" class="font-black text-sm text-amber-300 truncate max-w-[100px]">---</div>
-                        <div id="p1Score" class="text-xs text-amber-400 font-bold">---</div>
-                    </div>
-                    <div class="w-full h-36 bg-gradient-to-t from-amber-700 via-amber-500 to-yellow-400 rounded-t-2xl border-t-4 border-yellow-200 flex items-center justify-center font-black text-3xl text-amber-950 shadow-2xl">1</div>
-                </div>
-
-                <!-- 3rd Place -->
-                <div id="podium3" class="flex flex-col items-center w-24 sm:w-32 transition-all duration-700">
-                    <div class="text-center mb-2">
-                        <div class="w-10 h-10 rounded-full bg-amber-800/30 border-2 border-amber-700 flex items-center justify-center text-amber-600 font-bold mx-auto mb-1 text-xs">🥉</div>
-                        <div id="p3Name" class="font-bold text-xs text-amber-600 truncate max-w-[80px]">---</div>
-                        <div id="p3Score" class="text-[10px] text-slate-400">---</div>
-                    </div>
-                    <div class="w-full h-20 bg-gradient-to-t from-amber-900 to-amber-800 rounded-t-2xl border-t-4 border-amber-600 flex items-center justify-center font-black text-xl text-amber-200 shadow-xl">3</div>
-                </div>
-            </div>
-
-            <!-- Leaderboard Table -->
-            <div class="bg-slate-900/80 rounded-2xl border border-slate-700 overflow-x-auto mb-6">
-                <table class="w-full text-right text-xs sm:text-sm">
-                    <thead class="bg-slate-800 text-slate-400 text-[11px]">
-                        <tr>
-                            <th class="p-3 text-center">المركز</th>
-                            <th class="p-3">اسم الطالب</th>
-                            <th class="p-3 text-center">الإجابات الصحيحة</th>
-                            <th class="p-3 text-center">الزمن</th>
-                            <th class="p-3 text-center">النقاط</th>
-                            <th class="p-3 text-center">الشهادة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardTableBody" class="divide-y divide-slate-800 text-slate-200"></tbody>
-                </table>
-            </div>
-
-            <div class="flex justify-center gap-3">
-                <button onclick="restartGame()" class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition text-sm flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-rotate-right"></i> العودة للرئيسية
-                </button>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- CERTIFICATE MODAL -->
-    <div id="certificateModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border-2 border-amber-500/80 rounded-3xl p-6 sm:p-10 max-w-2xl w-full text-center relative shadow-2xl text-slate-100">
-            <button onclick="closeCertificate()" class="no-print absolute top-4 left-4 w-10 h-10 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 flex items-center justify-center transition cursor-pointer">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <div class="p-6 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 rounded-2xl border-4 border-double border-amber-400/60 shadow-inner">
-                <div class="flex justify-between items-center mb-4">
-                    <i class="fa-solid fa-award text-3xl text-amber-400"></i>
-                    <span class="text-xs text-amber-300 font-bold tracking-widest uppercase">شهادة تفوق نَحْوِيّ</span>
-                    <i class="fa-solid fa-award text-3xl text-amber-400"></i>
-                </div>
-
-                <h3 class="text-2xl sm:text-3xl font-black text-amber-300 mb-2">شَهَادَةُ تَقْدِيرٍ وَتَفَوُّقٍ</h3>
-                <p class="text-xs text-slate-300 mb-4">تَشْهَدُ إِدَارَةُ المَسَابَقَةِ بِأَنَّ الطَّالِبَ المَبْدِعَ:</p>
-
-                <div id="certStudentName" class="text-2xl sm:text-3xl font-black text-cyan-300 my-2 border-b-2 border-cyan-500/40 pb-2 inline-block px-8">...</div>
-
-                <p class="text-sm text-slate-200 leading-relaxed max-w-lg mx-auto my-4">
-                    قَدْ حَصَلَ عَلَى المَرْكَزِ <span id="certRank" class="font-bold text-amber-400">...</span> فِي مَسَابَقَةِ <span class="text-cyan-300 font-bold">"علامات بناء الفعل الماضي"</span> بِمَجْمُوعِ نِقَاطٍ <span id="certScore" class="font-bold text-emerald-400">...</span> نُقْطَةً فِي زَمَنٍ قِيَاسِيٍّ قَدْرُهُ <span id="certTime" class="font-bold text-sky-300">...</span> ث.
-                </p>
-
-                <div class="mt-6 pt-4 border-t border-slate-700 flex justify-between items-end text-xs text-slate-400">
-                    <div class="text-right">
-                        <div>التاريخ: <span id="certDate"></span></div>
-                        <div class="text-[10px] text-slate-500">تم التوثيق إلكترونياً</div>
-                    </div>
-                    <div class="text-center font-bold text-amber-300">
-                        <i class="fa-solid fa-check-circle text-emerald-400 me-1"></i> بَطَلُ النَّحْوِ
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-center gap-3 no-print">
-                <button onclick="window.print()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl transition text-sm flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-print"></i> طباعة الشهادة / حفظ PDF
-                </button>
-            </div>
-        </div>
+        <button class="start-btn" onclick="startGame()">ابدأ اللعب</button>
     </div>
 
-    <!-- GRAMMAR RULES MODAL -->
-    <div id="rulesModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-right relative shadow-2xl">
-            <button onclick="closeRulesModal()" class="absolute top-4 left-4 w-10 h-10 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 flex items-center justify-center cursor-pointer">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="text-xl sm:text-2xl font-black text-amber-400 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-book-open"></i> ملخص قواعد علامات بناء الفعل الماضي
-            </h3>
-
-            <div class="space-y-4 text-xs sm:text-sm text-slate-200">
-                <div class="p-3 bg-cyan-950/50 border-r-4 border-cyan-400 rounded-r-xl">
-                    <h4 class="font-bold text-cyan-300 mb-1">1️⃣ يُبنى على الفتح:</h4>
-                    <p>• إذا لم يتصل به شيء (مثل: <span class="text-amber-300">كتبَ</span>).</p>
-                    <p>• إذا اتصلت به تاء التأنيث الساكنة (مثل: <span class="text-amber-300">كتبَتْ</span>).</p>
-                    <p>• إذا اتصلت به ألف الاثنين (مثل: <span class="text-amber-300">كتبَا</span>).</p>
-                    <p>• إذا اتصلت به نا المفعولين/المتكلمين (مثل: <span class="text-amber-300">زارَنا المعلم</span>).</p>
-                </div>
-
-                <div class="p-3 bg-purple-950/50 border-r-4 border-purple-400 rounded-r-xl">
-                    <h4 class="font-bold text-purple-300 mb-1">2️⃣ يُبنى على الضم:</h4>
-                    <p>• إذا اتصلت به **واو الجماعة** (مثل: <span class="text-amber-300">كتبُوا</span>).</p>
-                </div>
-
-                <div class="p-3 bg-emerald-950/50 border-r-4 border-emerald-400 rounded-r-xl">
-                    <h4 class="font-bold text-emerald-300 mb-1">3️⃣ يُبنى على السكون:</h4>
-                    <p>• إذا اتصلت به تاء الفاعل (مثل: <span class="text-amber-300">كتبْتُ / كتبْتَ / كتبْتِ</span>).</p>
-                    <p>• إذا اتصلت به نا الفاعلين (مثل: <span class="text-amber-300">كتبْنَا</span>).</p>
-                    <p>• إذا اتصلت به نون النسوة (مثل: <span class="text-amber-300">كتبْنَ</span>).</p>
-                </div>
-            </div>
-            
-            <button onclick="closeRulesModal()" class="w-full mt-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm cursor-pointer">
-                فهمت القواعد، جاهز للتحدي!
-            </button>
+    <!-- شاشة اللعبة -->
+    <div id="game-screen" class="hidden">
+        <div class="score-board">
+            <span>اللاعب: <span id="display-name"></span></span>
+            <span>النتيجة: <span id="score">0</span> / <span id="total-q"></span></span>
         </div>
+        <div class="question-box" id="question-text">جاري تحميل السؤال...</div>
+        <div class="options-grid" id="options-container"></div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" class="next-btn hidden" onclick="nextQuestion()">السؤال التالي</button>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toastContainer" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-11/12 max-w-md"></div>
+    <!-- شاشة النهاية -->
+    <div id="end-screen" class="hidden">
+        <h1>أحسنت! أتممت الاختبار 🎉</h1>
+        <p style="font-size: 20px;">درجتك النهائية هي: <strong id="final-score" style="color: #27ae60;"></strong></p>
+        <div id="firebase-status" class="status-msg">جاري حفظ النتيجة في Firebase...</div>
+        <button class="start-btn" onclick="location.reload()">إعادة اللعب 🔄</button>
+    </div>
+</div>
 
-    <!-- JAVASCRIPT GAME LOGIC & REALTIME CLOUD SYNC -->
-    <script>
-        // --- 1. GRAMMAR QUESTIONS DATABASE ---
-        var questionsDatabase = [
-            {
-                sentence: "الطالب كتب الدرس بخط جميل.",
-                targetVerb: "كتب",
-                correctAnswer: "الفتح",
-                reason: "لأنه فعل ماضٍ لم يتصل به شيء."
-            },
-            {
-                sentence: "العلماء رفعوا راية العلم خفاقة.",
-                targetVerb: "رفعوا",
-                correctAnswer: "الضم",
-                reason: "لأنه اتصلت به واو الجماعة."
-            },
-            {
-                sentence: "أنا كتبت المقال بمهارة عالية.",
-                targetVerb: "كتبت",
-                correctAnswer: "السكون",
-                reason: "لأنه اتصلت به تاء الفاعل (المتحركة)."
-            },
-            {
-                sentence: "الطالبات فهمن شرح المعلم بوضوح.",
-                targetVerb: "فهمن",
-                correctAnswer: "السكون",
-                reason: "لأنه اتصلت به نون النسوة."
-            },
-            {
-                sentence: "الفتاة نجحت في الامتحان بتفوق.",
-                targetVerb: "نجحت",
-                correctAnswer: "الفتح",
-                reason: "لأنه اتصلت به تاء التأنيث الساكنة."
-            },
-            {
-                sentence: "نحن حفظنا القرآن الكريم كاملا.",
-                targetVerb: "حفظنا",
-                correctAnswer: "السكون",
-                reason: "لأنه اتصلت به (نا الفاعلين)."
-            },
-            {
-                sentence: "المعلمان شرحا الدرس بأسلوب ممتع.",
-                targetVerb: "شرحا",
-                correctAnswer: "الفتح",
-                reason: "لأنه اتصلت به ألف الاثنين."
-            },
-            {
-                sentence: "زارنا المعلم اليوم في منزلنا.",
-                targetVerb: "زارنا",
-                correctAnswer: "الفتح",
-                reason: "لأنه اتصلت به (نا المفعولين/المتكلمين) والمعلم هو الفاعل."
-            },
-            {
-                sentence: "الجنود دافعوا عن الوطن ببسالة.",
-                targetVerb: "دافعوا",
-                correctAnswer: "الضم",
-                reason: "لأنه اتصلت به واو الجماعة."
-            },
-            {
-                sentence: "هل شاركت في المسابقة الثقافية؟",
-                targetVerb: "شاركت",
-                correctAnswer: "السكون",
-                reason: "لأنه اتصلت به تاء الفاعل المخاطب."
-            }
-        ];
+<script>
+    // رابط Firebase المخصص للعبة
+    const FIREBASE_URL = "https://game2-c9a8e-default-rtdb.firebaseio.com/";
 
-        // --- 2. GAME STATE VARIABLES ---
-        var currentQuestionIndex = 0;
-        var currentScore = 0;
-        var currentCorrectCount = 0;
-        var streakCount = 0;
-        var questionStartTime = 0;
-        var startTime = 0;
-        var timerInterval = null;
-        var totalElapsedSeconds = 0;
-        var isProcessingAnswer = false;
-
-        var leaderboardData = [];
-        var myStudentName = '';
-        var selectedAvatarIcon = '🚀';
-        var soundEnabled = true;
-
-        // Shared REST API Endpoint for Global Real-time Cloud Synchronization
-        var CLOUD_API_ENDPOINT = 'https://kvdb.io/W97p3xN8Xy9Z2aK4mL1Q8p/arabic_grammar_leaderboard_v2';
-
-        // --- 3. STORAGE & REALTIME CLOUD ENGINE ---
-        window.updateCloudBadgeUI = function(isOnline, message) {
-            var badgeText = document.getElementById('cloudStatusText');
-            var badgeDot = document.getElementById('cloudStatusDot');
-            var badge = document.getElementById('cloudStatusBadge');
-
-            if (badgeText && badgeDot && badge) {
-                badgeText.innerText = message;
-                if (isOnline) {
-                    badgeDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-                    badge.className = "px-3 py-1.5 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-emerald-400 text-xs font-bold flex items-center gap-1.5 shadow-sm";
-                } else {
-                    badgeDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
-                    badge.className = "px-3 py-1.5 bg-amber-950/80 border border-amber-500/50 rounded-xl text-amber-300 text-xs font-bold flex items-center gap-1.5 shadow-sm";
-                }
-            }
-        };
-
-        function loadLocalLeaderboard() {
-            try {
-                var stored = localStorage.getItem('arabic_game_leaderboard');
-                if (stored) {
-                    leaderboardData = JSON.parse(stored);
-                } else {
-                    leaderboardData = [
-                        { name: "أحمد الفارس", avatar: "👑", score: 1200, correctCount: 10, time: "18.4" },
-                        { name: "مريم المبدعة", avatar: "⭐", score: 1050, correctCount: 9, time: "22.1" },
-                        { name: "عمر البطل", avatar: "🦁", score: 980, correctCount: 8, time: "25.0" }
-                    ];
-                    saveLocalLeaderboard();
-                }
-            } catch (e) {
-                leaderboardData = [];
-            }
-            renderLeaderboard();
+    // أسئلة الدرس (بناء الماضي والمضارع + علامات الإعراب الأصلية والفرعية)
+    const questions = [
+        {
+            q: "الولدُ **كَتَبَ** الدرسَ بخطٍ جميل.",
+            options: ["فعل ماضٍ مبني على الفتح", "فعل مضارع مرفوع بالضمة", "فعل ماضٍ مبني على السكون"],
+            answer: 0
+        },
+        {
+            q: "الطالباتُ **يَكْتُبْنَ** الواجبَ باتقان.",
+            options: ["فعل مضارع مرفوع بثبوت النون", "فعل مضارع مبني على السكون لاتصاله بنون النسوة", "فعل مضارع منصوب بالفتحة"],
+            answer: 1
+        },
+        {
+            q: "المعلمون **يَجْتَهِدُونَ** في عملهم.",
+            options: ["فعل مضارع مرفوع بالضمة (علامة أصلية)", "فعل مضارع مرفوع بثبوت النون (علامة فرعية)", "فعل ماضٍ مبني على الواو"],
+            answer: 1
+        },
+        {
+            q: "الطَلاّبُ لَنْ **يَهْمِلُوا** دروسهم.",
+            options: ["فعل مضارع مجزوم بالسكون (علامة أصلية)", "فعل مضارع منصوب بحذف النون (علامة فرعية)", "فعل مضارع مبني على الضم"],
+            answer: 1
+        },
+        {
+            q: "لا **تَدْعُ** إلا اللهَ وحده.",
+            options: ["فعل مضارع مجزوم بحذف حرف العلة (علامة فرعية)", "فعل مضارع مجزوم بالسكون (علامة أصلية)", "فعل مضارع مبني على حذف النون"],
+            answer: 0
+        },
+        {
+            q: "العلمُ **يَرْفَعُ** شَأْنَ صاحِبِهِ.",
+            options: ["فعل مضارع مرفوع بالضمة (علامة أصلية)", "فعل مضارع مبني على الفتح", "فعل مضارع مرفوع بثبوت النون"],
+            answer: 0
+        },
+        {
+            q: "لَمْ **يَتَأَخَّرْ** عليٌّ عَنِ المَوْعِدِ.",
+            options: ["فعل مضارع مجزوم بالسكون (علامة أصلية)", "فعل مضارع مجزوم بحذف حرف العلة", "فعل ماضٍ مبني على السكون"],
+            answer: 0
         }
+    ];
 
-        function saveLocalLeaderboard() {
-            try {
-                localStorage.setItem('arabic_game_leaderboard', JSON.stringify(leaderboardData));
-            } catch (e) {}
+    let currentQ = 0;
+    let score = 0;
+    let playerName = "";
+
+    function startGame() {
+        const input = document.getElementById("player-name").value.trim();
+        if (!input) {
+            alert("يرجى كتابة اسمك أولاً!");
+            return;
         }
-
-        window.updateLeaderboardDataFromCloud = function(cloudScores) {
-            if (!Array.isArray(cloudScores)) return;
-            
-            cloudScores.forEach(function(cObj) {
-                if (!cObj || !cObj.name) return;
-                var idx = leaderboardData.findIndex(function(l) { return l.name === cObj.name; });
-                if (idx !== -1) {
-                    if (cObj.score >= leaderboardData[idx].score) {
-                        leaderboardData[idx] = cObj;
-                    }
-                } else {
-                    leaderboardData.push(cObj);
-                }
-            });
-            saveLocalLeaderboard();
-            renderLeaderboard();
-        };
-
-        async function fetchCloudLeaderboard() {
-            try {
-                var res = await fetch(CLOUD_API_ENDPOINT, { cache: 'no-store' });
-                if (res.ok) {
-                    var data = await res.json();
-                    if (Array.isArray(data)) {
-                        window.updateLeaderboardDataFromCloud(data);
-                        window.updateCloudBadgeUI(true, "السحابة نشطة 🟢 (تجميع مباشر لكل الجوالات)");
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.log("Fetch cloud fallback:", err);
-            }
-            window.updateCloudBadgeUI(true, "تجميع السحابة مباشر 🟢");
-        }
-
-        async function syncScoreToCloud(resultObj) {
-            // First update locally
-            var existingIdx = leaderboardData.findIndex(function(item) {
-                return item.name === resultObj.name;
-            });
-
-            if (existingIdx !== -1) {
-                if (resultObj.score >= leaderboardData[existingIdx].score) {
-                    leaderboardData[existingIdx] = resultObj;
-                }
-            } else {
-                leaderboardData.push(resultObj);
-            }
-
-            saveLocalLeaderboard();
-            renderLeaderboard();
-
-            // Push to shared global endpoint
-            try {
-                var fetchedScores = [];
-                try {
-                    var res = await fetch(CLOUD_API_ENDPOINT, { cache: 'no-store' });
-                    if (res.ok) fetchedScores = await res.json();
-                } catch(e) {}
-
-                if (!Array.isArray(fetchedScores)) fetchedScores = leaderboardData;
-
-                var idx = fetchedScores.findIndex(function(s) { return s.name === resultObj.name; });
-                if (idx !== -1) {
-                    if (resultObj.score >= fetchedScores[idx].score) {
-                        fetchedScores[idx] = resultObj;
-                    }
-                } else {
-                    fetchedScores.push(resultObj);
-                }
-
-                await fetch(CLOUD_API_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(fetchedScores)
-                });
-
-                window.updateLeaderboardDataFromCloud(fetchedScores);
-                showToast("تم إرسال درجتك وتحديث لوحة الشرف العامة بنجاح! 🏆", "success");
-            } catch (err) {
-                console.error("Cloud push error:", err);
-            }
-        }
-
-        // Auto Poll Cloud Leaderboard every 3.5 seconds
-        setInterval(fetchCloudLeaderboard, 3500);
-
-        // --- 4. AUDIO SYNTHESIS ENGINE ---
-        var audioCtx = null;
-
-        function getAudioContext() {
-            try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                return audioCtx;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        window.toggleSound = function() {
-            soundEnabled = !soundEnabled;
-            var btn = document.getElementById('soundIcon');
-            if (btn) {
-                btn.className = soundEnabled ? 'fa-solid fa-volume-high text-cyan-400' : 'fa-solid fa-volume-xmark text-rose-400';
-            }
-            showToast(soundEnabled ? "تم تفعيل الصوت" : "تم كتم الصوت", "info");
-        };
-
-        function playSoundSuccess() {
-            if (!soundEnabled) return;
-            try {
-                var ctx = getAudioContext();
-                if (!ctx) return;
-                var now = ctx.currentTime;
-                var osc = ctx.createOscillator();
-                var gain = ctx.createGain();
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
-                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
-
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                osc.start(now);
-                osc.stop(now + 0.35);
-            } catch (e) {}
-        }
-
-        function playSoundWrong() {
-            if (!soundEnabled) return;
-            try {
-                var ctx = getAudioContext();
-                if (!ctx) return;
-                var now = ctx.currentTime;
-                var osc = ctx.createOscillator();
-                var gain = ctx.createGain();
-
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now);
-                osc.frequency.exponentialRampToValueAtTime(130, now + 0.25);
-
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } catch (e) {}
-        }
-
-        function playSoundVictory() {
-            if (!soundEnabled) return;
-            try {
-                var ctx = getAudioContext();
-                if (!ctx) return;
-                var notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach(function(freq, idx) {
-                    var osc = ctx.createOscillator();
-                    var gain = ctx.createGain();
-                    var now = ctx.currentTime + (idx * 0.12);
-
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(freq, now);
-
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                });
-            } catch (e) {}
-        }
-
-        // --- 5. UI VIEW & NAVIGATION ---
-        function showView(viewId) {
-            ['viewHome', 'viewQuiz', 'viewLeaderboard'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) {
-                    if (id === viewId) {
-                        el.classList.remove('hidden');
-                    } else {
-                        el.classList.add('hidden');
-                    }
-                }
-            });
-        }
-
-        window.selectAvatar = function(icon) {
-            selectedAvatarIcon = icon;
-            document.querySelectorAll('.avatar-opt').forEach(function(btn) {
-                if (btn.getAttribute('data-avatar') === icon) {
-                    btn.classList.add('bg-amber-500/30', 'border', 'border-amber-400');
-                } else {
-                    btn.classList.remove('bg-amber-500/30', 'border', 'border-amber-400');
-                }
-            });
-            try { localStorage.setItem('arabic_game_avatar', icon); } catch(e){}
-        };
-
-        function showToast(message, type) {
-            type = type || 'info';
-            var container = document.getElementById('toastContainer');
-            if (!container) return;
-
-            var toast = document.createElement('div');
-            var iconClass = 'fa-info-circle text-cyan-400';
-            var borderClass = 'border-cyan-500/50';
-
-            if (type === 'success') {
-                iconClass = 'fa-circle-check text-emerald-400';
-                borderClass = 'border-emerald-500/50';
-            } else if (type === 'warning') {
-                iconClass = 'fa-triangle-exclamation text-amber-400';
-                borderClass = 'border-amber-500/50';
-            } else if (type === 'error') {
-                iconClass = 'fa-circle-xmark text-rose-400';
-                borderClass = 'border-rose-500/50';
-            }
-
-            toast.className = 'p-3.5 bg-slate-900/95 backdrop-blur-md border ' + borderClass + ' text-white text-xs sm:text-sm rounded-xl shadow-2xl flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 pointer-events-auto';
-            toast.innerHTML = '<i class="fa-solid ' + iconClass + ' text-base"></i><span>' + message + '</span>';
-
-            container.appendChild(toast);
-            setTimeout(function() {
-                toast.classList.add('opacity-0', '-translate-y-2');
-                setTimeout(function() { toast.remove(); }, 300);
-            }, 3000);
-        }
-
-        window.toggleFullScreen = function() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function() {});
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
-        };
-
-        window.copyGameLink = function() {
-            var url = window.location.href;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url);
-            } else {
-                var textarea = document.createElement("textarea");
-                textarea.value = url;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textarea);
-            }
-            showToast("تم نسخ رابط اللعبة بنجاح!", "success");
-        };
-
-        window.viewLeaderboardOnly = function() {
-            fetchCloudLeaderboard();
-            renderLeaderboard();
-            showView('viewLeaderboard');
-        };
-
-        // --- 6. GAMEPLAY ENGINE ---
-        window.startDirectGame = function() {
-            getAudioContext();
-            var nameInput = document.getElementById('directStudentNameInput').value.trim();
-
-            if (!nameInput) {
-                showToast("يرجى إدخال اسم الطالب للبدء!", "warning");
-                return;
-            }
-
-            myStudentName = nameInput;
-            try { localStorage.setItem('arabic_game_student_name', myStudentName); } catch(e){}
-
-            startQuiz();
-        };
-
-        function startQuiz() {
-            currentQuestionIndex = 0;
-            currentScore = 0;
-            currentCorrectCount = 0;
-            streakCount = 0;
-            totalElapsedSeconds = 0;
-            isProcessingAnswer = false;
-            showView('viewQuiz');
-
-            document.getElementById('currentStudentDisplay').innerText = myStudentName || "الطالب المتنافس";
-            document.getElementById('studentAvatarBadge').innerText = selectedAvatarIcon;
-            document.getElementById('scoreDisplay').innerText = '0';
-            document.getElementById('streakDisplay').innerText = '0x';
-
-            startTimer();
-            loadNextQuestion();
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            startTime = Date.now();
-            timerInterval = setInterval(function() {
-                totalElapsedSeconds = (Date.now() - startTime) / 1000;
-                document.getElementById('timerDisplay').innerText = totalElapsedSeconds.toFixed(1) + 's';
-            }, 100);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        function loadNextQuestion() {
-            isProcessingAnswer = false;
-
-            // Reset option buttons
-            var optBtns = document.querySelectorAll('.option-card');
-            optBtns.forEach(function(btn) {
-                btn.style.pointerEvents = 'auto';
-                btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-rose-500');
-            });
-
-            if (currentQuestionIndex >= questionsDatabase.length) {
-                finishQuiz();
-                return;
-            }
-
-            questionStartTime = Date.now();
-
-            var q = questionsDatabase[currentQuestionIndex];
-            document.getElementById('questionSentence').innerText = q.sentence;
-            document.getElementById('targetVerbText').innerText = q.targetVerb;
-
-            document.getElementById('qCurrent').innerText = currentQuestionIndex + 1;
-            document.getElementById('qTotal').innerText = questionsDatabase.length;
-
-            var progressPct = (currentQuestionIndex / questionsDatabase.length) * 100;
-            document.getElementById('quizProgressBar').style.width = progressPct + '%';
-
-            var feedbackBox = document.getElementById('feedbackBox');
-            if (feedbackBox) {
-                feedbackBox.className = "p-4 rounded-2xl text-center hidden transition-all duration-300";
-            }
-        }
-
-        window.handleAnswer = function(selectedOption, btnElement) {
-            if (isProcessingAnswer) return;
-            isProcessingAnswer = true;
-
-            // Lock all option buttons during transition
-            var optBtns = document.querySelectorAll('.option-card');
-            optBtns.forEach(function(btn) {
-                btn.style.pointerEvents = 'none';
-            });
-
-            var q = questionsDatabase[currentQuestionIndex];
-            var feedbackBox = document.getElementById('feedbackBox');
-            var feedbackText = document.getElementById('feedbackText');
-            var feedbackReason = document.getElementById('feedbackReason');
-
-            var answerTimeSec = (Date.now() - questionStartTime) / 1000;
-            var earnedPoints = 0;
-
-            if (selectedOption === q.correctAnswer) {
-                playSoundSuccess();
-                currentCorrectCount++;
-                streakCount++;
-
-                earnedPoints = 100;
-
-                // Speed bonus
-                if (answerTimeSec < 5) {
-                    earnedPoints += Math.round((5 - answerTimeSec) * 10);
-                }
-
-                // Streak bonus
-                if (streakCount > 1) {
-                    earnedPoints += (streakCount - 1) * 20;
-                }
-
-                currentScore += earnedPoints;
-
-                feedbackBox.className = "p-4 rounded-2xl text-center bg-emerald-950/90 border-2 border-emerald-500 block text-emerald-300 mb-4 animate-bounce-short shadow-lg";
-                feedbackText.innerText = "إجابة صحيحة وممتازة! 👏 (+" + earnedPoints + " نقطة) " + (streakCount > 1 ? '🔥 سلسلة ' + streakCount + 'x' : '');
-
-                if (btnElement) {
-                    btnElement.classList.add('ring-4', 'ring-emerald-400');
-                }
-            } else {
-                playSoundWrong();
-                streakCount = 0;
-                feedbackBox.className = "p-4 rounded-2xl text-center bg-rose-950/90 border-2 border-rose-500 block text-rose-300 mb-4 shadow-lg";
-                feedbackText.innerText = "إجابة خاطئة! الإجابة الصحيحة هي: (مبني على " + q.correctAnswer + ")";
-
-                if (btnElement) {
-                    btnElement.classList.add('ring-4', 'ring-rose-500');
-                }
-            }
-
-            document.getElementById('streakDisplay').innerText = streakCount + 'x';
-            document.getElementById('scoreDisplay').innerText = currentScore;
-            feedbackReason.innerText = q.reason;
-
-            currentQuestionIndex++;
-            setTimeout(function() {
-                loadNextQuestion();
-            }, 1400);
-        };
-
-        function finishQuiz() {
-            stopTimer();
-
-            var resultObj = {
-                name: myStudentName,
-                avatar: selectedAvatarIcon,
-                score: currentScore,
-                correctCount: currentCorrectCount,
-                time: totalElapsedSeconds.toFixed(1)
-            };
-
-            syncScoreToCloud(resultObj);
-            showView('viewLeaderboard');
-            triggerConfetti();
-            playSoundVictory();
-        }
-
-        // --- 7. LEADERBOARD & CERTIFICATE RENDERERS ---
-        function renderLeaderboard() {
-            leaderboardData.sort(function(a, b) {
-                if (b.score !== a.score) return b.score - a.score;
-                return parseFloat(a.time) - parseFloat(b.time);
-            });
-
-            var p1 = leaderboardData[0];
-            var p2 = leaderboardData[1];
-            var p3 = leaderboardData[2];
-
-            var pod1 = document.getElementById('podium1');
-            var pod2 = document.getElementById('podium2');
-            var pod3 = document.getElementById('podium3');
-
-            if (p1) {
-                document.getElementById('p1Name').innerText = (p1.avatar || '🚀') + ' ' + p1.name;
-                document.getElementById('p1Score').innerText = p1.score + ' ن (' + p1.time + 'ث)';
-                if (pod1) pod1.style.opacity = '1';
-            }
-            if (p2) {
-                document.getElementById('p2Name').innerText = (p2.avatar || '🚀') + ' ' + p2.name;
-                document.getElementById('p2Score').innerText = p2.score + ' ن (' + p2.time + 'ث)';
-                if (pod2) pod2.style.opacity = '1';
-            }
-            if (p3) {
-                document.getElementById('p3Name').innerText = (p3.avatar || '🚀') + ' ' + p3.name;
-                document.getElementById('p3Score').innerText = p3.score + ' ن (' + p3.time + 'ث)';
-                if (pod3) pod3.style.opacity = '1';
-            }
-
-            var tbody = document.getElementById('leaderboardTableBody');
-            if (tbody) {
-                tbody.innerHTML = leaderboardData.map(function(item, idx) {
-                    var rankBadge = (idx + 1).toString();
-                    if (idx === 0) rankBadge = '🥇 1';
-                    else if (idx === 1) rankBadge = '🥈 2';
-                    else if (idx === 2) rankBadge = '🥉 3';
-
-                    return '<tr class="hover:bg-slate-800/50 transition">' +
-                        '<td class="p-3 text-center font-bold">' + rankBadge + '</td>' +
-                        '<td class="p-3 font-bold text-cyan-300"><span class="me-2">' + (item.avatar || '🚀') + '</span> ' + item.name + '</td>' +
-                        '<td class="p-3 text-center font-mono text-emerald-400 font-bold">' + item.correctCount + '/' + questionsDatabase.length + '</td>' +
-                        '<td class="p-3 text-center font-mono text-slate-300">' + item.time + 's</td>' +
-                        '<td class="p-3 text-center font-mono text-amber-400 font-black">' + item.score + '</td>' +
-                        '<td class="p-3 text-center">' +
-                            '<button onclick="openCertificate(\'' + item.name.replace(/'/g, "\\'") + '\', ' + (idx + 1) + ', ' + item.score + ', \'' + item.time + '\')" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/50 rounded-lg text-xs font-bold transition cursor-pointer">' +
-                                '<i class="fa-solid fa-certificate me-1"></i> الشهادة' +
-                            '</button>' +
-                        '</td>' +
-                    '</tr>';
-                }).join('');
-            }
-        }
-
-        window.openCertificate = function(name, rank, score, time) {
-            document.getElementById('certStudentName').innerText = name;
-            document.getElementById('certRank').innerText = rank === 1 ? 'الأول 🥇' : rank === 2 ? 'الثاني 🥈' : rank === 3 ? 'الثالث 🥉' : ('الـ ' + rank);
-            document.getElementById('certScore').innerText = score;
-            document.getElementById('certTime').innerText = time;
-            document.getElementById('certDate').innerText = new Date().toLocaleDateString('ar-EG');
-
-            document.getElementById('certificateModal').classList.remove('hidden');
-        };
-
-        window.closeCertificate = function() {
-            document.getElementById('certificateModal').classList.add('hidden');
-        };
-
-        window.openRulesModal = function() {
-            document.getElementById('rulesModal').classList.remove('hidden');
-        };
-
-        window.closeRulesModal = function() {
-            document.getElementById('rulesModal').classList.add('hidden');
-        };
-
-        function triggerConfetti() {
-            if (typeof confetti === 'function') {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
-            }
-        }
-
-        window.restartGame = function() {
-            showView('viewHome');
-        };
-
-        // --- 8. INITIALIZATION ON LOAD ---
-        window.addEventListener('DOMContentLoaded', function() {
-            try {
-                var savedName = localStorage.getItem('arabic_game_student_name');
-                var savedAvatar = localStorage.getItem('arabic_game_avatar') || '🚀';
-
-                if (savedName) {
-                    var nameInput = document.getElementById('directStudentNameInput');
-                    if (nameInput) nameInput.value = savedName;
-                }
-                selectAvatar(savedAvatar);
-            } catch (e) {}
-
-            loadLocalLeaderboard();
-            fetchCloudLeaderboard();
+        playerName = input;
+        document.getElementById("display-name").innerText = playerName;
+        document.getElementById("total-q").innerText = questions.length;
+        document.getElementById("start-screen").classList.add("hidden");
+        document.getElementById("game-screen").classList.remove("hidden");
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const qData = questions[currentQ];
+        document.getElementById("question-text").innerHTML = qData.q;
+        document.getElementById("feedback").innerText = "";
+        document.getElementById("next-btn").classList.add("hidden");
+        
+        const container = document.getElementById("options-container");
+        container.innerHTML = "";
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(idx, btn);
+            container.appendChild(btn);
         });
-    </script>
+    }
+
+    function checkAnswer(selectedIdx, btnElement) {
+        const buttons = document.querySelectorAll(".option-btn");
+        buttons.forEach(b => b.disabled = true); // تعطيل بقية الأزرار
+
+        const correctIdx = questions[currentQ].answer;
+        if (selectedIdx === correctIdx) {
+            btnElement.classList.add("correct");
+            document.getElementById("feedback").innerText = "إجابة صحيحة! 👏";
+            document.getElementById("feedback").style.color = "#28a745";
+            score++;
+            document.getElementById("score").innerText = score;
+        } else {
+            btnElement.classList.add("wrong");
+            buttons[correctIdx].classList.add("correct");
+            document.getElementById("feedback").innerText = "إجابة خاطئة! ❌";
+            document.getElementById("feedback").style.color = "#dc3545";
+        }
+
+        document.getElementById("next-btn").classList.remove("hidden");
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showEndScreen();
+        }
+    }
+
+    function showEndScreen() {
+        document.getElementById("game-screen").classList.add("hidden");
+        document.getElementById("end-screen").classList.remove("hidden");
+        document.getElementById("final-score").innerText = `${score} من ${questions.length}`;
+
+        // إرسال البيانات إلى Firebase
+        saveToFirebase();
+    }
+
+    function saveToFirebase() {
+        const statusEl = document.getElementById("firebase-status");
+        const payload = {
+            name: playerName,
+            score: score,
+            total: questions.length,
+            timestamp: new Date().toISOString()
+        };
+
+        // استخدام REST API الخاص بقاعدة البيانات
+        fetch(`${FIREBASE_URL}/scores.json`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+            if (res.ok) {
+                statusEl.innerText = "تم حفظ النتيجة في قاعدة البيانات بنجاح! ✅";
+                statusEl.style.color = "#27ae60";
+            } else {
+                throw new Error();
+            }
+        })
+        .catch(err => {
+            statusEl.innerText = "تعذر حفظ النتيجة تلقائياً. تأكد من إعدادات الحماية في Firebase.";
+            statusEl.style.color = "#dc3545";
+        });
+    }
+</script>
+
 </body>
 </html>
